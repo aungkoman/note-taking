@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -52,9 +53,15 @@ class AuthController extends Controller
 
         // 4. Return response
         return response()->json([
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer'
+            'message' => 'Registeration is successful.',
+            "Data"=>[
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role->name ?? null,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+            ]
         ], 201);
     }
 }

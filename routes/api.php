@@ -16,7 +16,8 @@ Route::prefix('V1/notes')
     // ->middleware('auth:api')
     ->controller(NoteController::class)
     ->group(function () {
-        Route::get('/', 'index');         // GET /category
+        Route::get('/', 'index');
+        Route::get('/{id}', 'detail');         // GET /category
         Route::post('/', 'store');        // POST /category
         Route::put('/{id}', 'update');    // PUT /category/5
         Route::delete('/{id}', 'destroy');// DELETE /category/5

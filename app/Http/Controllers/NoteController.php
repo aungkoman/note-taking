@@ -14,13 +14,13 @@ class NoteController extends Controller
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
-         $validated = $request->validate([
+        $validated = $request->validate([
                 'title' => 'sometimes|string',
                 'description' => 'sometimes|text',
                 'date' => 'sometimes|date',
             ], [
-                'date.date' => 'Date must be a valid date.',
-            ]);
+                'date.date' => 'Date must be a valid date.YYYY-MM-DD',
+        ]);
         $perPage = 2;
         $page = $request->input('page', 1);
         $query = Note::where('user_id', $user);
@@ -64,37 +64,63 @@ class NoteController extends Controller
         ]);
 
     }
+    public function detail(Request $request, $id){
+        $user  = get_authenticated_user();
+        if ($user instanceof \Illuminate\Http\JsonResponse) {
+            return $user;
+        }
+        $perPage = 2;
+        $page = $request->input('page', 1);
+        $query = Note::where('id', $id)
+                        ->where('user_id', $user);
+                        // ->firstOrFail();
+        if(!$query->exists()){
+            return response()->json([
+                'message' => 'No notes found for this user.'
+            ], 404);
+        }
+        $note = $query->paginate($perPage, ['*'], 'page', $page);
+
+        if ($note->isEmpty()) {
+            return response()->json([
+                'message' => 'No record found',
+            ], 422);
+        }
+        return response()->json([
+            'message' => 'Note',
+            'data' => $note->items(),
+            'total' => $note->total(),
+            'current_page' => $note->currentPage(),
+            'last_page' => $note->lastPage(),
+        ]);
+
+    }
     public function store(Request $request)
     {
         $user  = get_authenticated_user();
         if ($user instanceof \Illuminate\Http\JsonResponse) {
             return $user;
         }
-
         try {
            $validated = $request->validate([
                 'title' => 'required|string',
                 'description' => 'required|string|max:255',
-                'date' => 'required|date',
+                'date' => 'required|date_format:Y-m-d',
             ], [
                 'title.required' => 'Title is required.',
                 'title.string' => 'Title must be a string.',
                 'description.required' => 'description is required.',
                 'date.required' => 'Date is required.',
-                'date.date' => 'Date must be a valid date.(DD-MM-YYYY)',
             ]);
-
-            // Create the record
-            $date = \Carbon\Carbon::createFromFormat('d-m-Y', $validated['date'])->format('Y-m-d');
             $note = Note::create([
                 'title' => $validated['title'],
                 'description' => $validated['description'],
                 'user_id' => $user,
-                'date' => $date,
+                'date' => $validated['date'],
             ]);
 
             return response()->json([
-                'message' => 'Expense record created successfully!',
+                'message' => 'Note is created successfully!',
                 'data' => $note
             ], 201);
         } catch (\Exception $e) {
@@ -104,7 +130,6 @@ class NoteController extends Controller
                 // 'line' => $e->getLine(),
             ], 400);
         }
-       
     }
     public function update(Request $request, $id)
     {
@@ -114,54 +139,42 @@ class NoteController extends Controller
             if ($user instanceof \Illuminate\Http\JsonResponse) {
                 return $user;
             }
+           
 
             // Validate the request
            $validated = $request->validate([
-                'cat_id' => 'sometimes|integer',
-                'note' => 'sometimes|string|nullable',
-                'amount' => 'sometimes|numeric|min:0',
-                'date' => 'sometimes|date',
+                'title' => 'sometimes|string',
+                'description' => 'sometimes|string|nullable',
+                'date' => 'required|date_format:Y-m-d',
             ], [
-                'cat_id.integer' => 'Category must be a valid ID.',
-                'amount.numeric' => 'Amount must be a number.',
-                'amount.min' => 'Amount must be at least 0.',
-                'date.date' => 'Date must be a valid date.',
+                'title.string' => 'Title must be a string.',
+                'date.date' => 'Date must be a valid date.(YYYY-MM-DD)',
             ]);
 
-
+            
             // Find the category
-            $Note = Note::where('id', $id)
+            $note = Note::where('id', $id)
                             ->where('user_id', $user)
                             ->firstOrFail();
-
-            // Step 2: If cat_id is provided, verify that it belongs to the same user
-            if (isset($validated['cat_id'])) {
-                $category = ExpenseCategory::where('id', $validated['cat_id'])
-                            ->where('user_id', $user)
-                            ->first();
-
-                if (!$category) {
-                    return response()->json([
-                        'message' => 'Invalid record for this user.'
-                    ], 404);
-                }
+            
+            if (!$note->exists()) {
+                return response()->json([
+                    'message' => 'No notes found for this user.'
+                ], 404);
             }
-
             // Update the category
-            $Note->update($validated);
+            $note->update($validated);
 
             return response()->json([
-                'message' => 'Expense record updated successfully.',
+                'message' => 'Note is updated successfully.',
                 'record' => [
-                    'id' => $Note->id,
-                    'user_id' => $Note->user_id,
-                    'cat_id' => $Note->cat_id,
-                    'category_name' => $Note->expenseCategory->name ?? null,
-                    'note' => $Note->note,
-                    'amount' => $Note->amount,
-                    'date' => $Note->date,
-                    'created_at' => $Note->created_at,
-                    'updated_at' => $Note->updated_at,
+                    'id' => $note->id,
+                    'user_id' => $note->user_id,
+                    'title' => $note->title,
+                    'description' => $note->description,
+                    'date' => $note->date,
+                    'created_at' => $note->created_at,
+                    'updated_at' => $note->updated_at,
                 ]
             ], 200);
 
@@ -188,15 +201,19 @@ class NoteController extends Controller
             }
 
             // Find the category that belongs to the user
-            $Note = Note::where('id', $id)
+            $note = Note::where('id', $id)
                             ->where('user_id', $user)
                             ->firstOrFail();
-
             // Delete it
-            $Note->delete();
+             if (!$note->exists()) {
+                return response()->json([
+                    'message' => 'No notes found for this user.'
+                ], 404);
+            }
+            $note->delete();
 
             return response()->json([
-                'message' => 'Expense category deleted successfully.'
+                'message' => 'Note is deleted successfully.'
             ], 200);
          } catch (ModelNotFoundException $e) {
             return response()->json([
