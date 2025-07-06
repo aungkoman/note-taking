@@ -17,6 +17,8 @@ if (!function_exists('get_authenticated_user')) {
             return response()->json(['error' => 'Token is invalid'], 401);
         } catch (JWTException $e) {
             return response()->json(['error' => 'Token is missing or malformed'], 400);
+        }catch (\Exception) {
+            return null;
         }
     }
 

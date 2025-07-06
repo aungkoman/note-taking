@@ -32,7 +32,7 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|unique:users,email',
                 'password' => 'required|string|min:6|confirmed',
-                'role_id'=>'required|integer',
+                'role_id'=>'required|integer|exists:roles,id',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
