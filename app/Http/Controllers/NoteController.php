@@ -167,7 +167,7 @@ class NoteController extends Controller
 
             return response()->json([
                 'message' => 'Note is updated successfully.',
-                'record' => [
+                'data' => [
                     'id' => $note->id,
                     'user_id' => $note->user_id,
                     'title' => $note->title,

@@ -8,12 +8,11 @@ use App\Http\Controllers\NoteController;
 
 
 
-Route::post('V1/register', [AuthController::class, 'register']);
-Route::post('V1/login', [AuthController::class, 'login']);
+Route::post('v1/register', [AuthController::class, 'register']);
+Route::post('v1/login', [AuthController::class, 'login']);
 
 
-Route::prefix('V1/notes')
-    // ->middleware('auth:api')
+Route::prefix('v1/notes')
     ->controller(NoteController::class)
     ->group(function () {
         Route::get('/', 'index');
