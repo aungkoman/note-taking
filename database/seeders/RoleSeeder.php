@@ -16,7 +16,7 @@ class RoleSeeder extends Seeder
         // $now=Carboon::now();
         Role::insert([
             ['id'=>1,'name'=>'Admin','created_at'=>now(),'updated_at'=>now()],
-            ['id'=>2,'name'=>'user','created_at'=>now(),'updated_at'=>now()],
+            ['id'=>2,'name'=>'User','created_at'=>now(),'updated_at'=>now()],
         ]);
     }
 }
