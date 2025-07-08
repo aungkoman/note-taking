@@ -17,6 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Hidden;
+use Illuminate\Database\Eloquent\Model;
 
 class NoteResource extends Resource
 {
@@ -30,11 +31,7 @@ class NoteResource extends Resource
             ->schema([
                 Hidden::make('user_id')
                     ->default(auth()->id()),
-                // TextInput::make('user_name')
-                //     ->label('User')
-                //     ->default(auth()->user()->name ?? '')
-                //     ->disabled()
-                //     ->dehydrated(false),
+
                 TextInput::make('title')
                     ->label('Title')
                     ->required()
@@ -57,6 +54,7 @@ class NoteResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('serial_no')->label('No')->rowIndex(),
                 Tables\Columns\TextColumn::make('title')->searchable(),
                 Tables\Columns\TextColumn::make('description'),
                 Tables\Columns\TextColumn::make('date')->date(),
@@ -91,9 +89,33 @@ class NoteResource extends Resource
             'edit' => Pages\EditNote::route('/{record}/edit'),
         ];
     }
-    // public static function mutateFormDataBeforeCreate(array $data): array
-    // {
-    //     $data['user_id'] = auth("api")->id(); 
-    //     return $data;
-    // }
+    
+
+    public static function getEloquentQuery(): Builder
+    {
+       $query = parent::getEloquentQuery();
+
+        // Role 2: Only show their own notes
+        if (auth()->check() && auth()->user()->role_id === 2) {
+            $query->where('user_id', auth()->id());
+        }
+
+        // Role 1: see all notes (no filter)
+
+        return $query;
+    }
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->role_id === 2;
+    }
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->role_id === 2 && $record->user_id === auth()->id();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->role_id === 2 && $record->user_id === auth()->id();
+    }
+
 }

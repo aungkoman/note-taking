@@ -126,4 +126,8 @@ class UserResource extends Resource
 
         return $data;
     }
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role_id === 1; // Only role 1 can see users
+    }
 }
