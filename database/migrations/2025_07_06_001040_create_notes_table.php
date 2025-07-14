@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description'); // More space for text
             $table->unsignedBigInteger('user_id');
-            $table->foreign("user_id")->references("id")->on("users");
+            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
             $table->date('date');
             $table->timestamps();
         });
