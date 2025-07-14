@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Hidden;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Components\RichEditor;
 
 class NoteResource extends Resource
 {
@@ -37,16 +38,20 @@ class NoteResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->extraAttributes(['placeholder' => 'Enter title']),
-
+                DatePicker::make('date')
+                    ->label('Date')
+                    ->required(),
+                // RichEditor::make('Description') 
+                //     ->label('Description') 
+                //     ->extraAttributes(['placeholder' => 'Write description...'])
+                //     ->required(),           // optional validation rule
                 TextArea::make('description')
                     ->label('Description')
                     ->required()
                     ->rows(5)
                     ->extraAttributes(['placeholder' => 'Write description...']),
 
-                DatePicker::make('date')
-                    ->label('Date')
-                    ->required(),
+                
             ]);
     }
 
