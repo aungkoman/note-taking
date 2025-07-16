@@ -110,23 +110,6 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
-    public static function mutateFormDataBeforeCreate(array $data): array
-    {
-        if (! empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        return $data;
-    }
-
-    public static function mutateFormDataBeforeSave(array $data): array
-    {
-        if (! empty($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
-        }
-
-        return $data;
-    }
     public static function canViewAny(): bool
     {
         return auth()->user()?->role_id === 1; // Only role 1 can see users
