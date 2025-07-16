@@ -25,11 +25,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             RoleSeeder::class,
-<<<<<<< HEAD
             UserSeeder::class,
-=======
-            UserSeeder::class
->>>>>>> 457bc200418e30a684f9137ea10d4e8b8e8f2e66
         ]);
     }
 }
