@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -27,12 +28,16 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'role_id' => $this->role_id,
+            'name' => $this->name,
+        ];
     }
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
+
      public function canAccessPanel(Panel $panel): bool
     {
         // Optional: restrict access by role
@@ -47,20 +52,4 @@ class User extends Authenticatable implements JWTSubject, FilamentUser
 
         return route('filament.resources.users.index');
     }
-     protected static function booted()
-    {
-        static::creating(function ($user) {
-            if (! empty($user->password)) {
-                $user->password = Hash::make($user->password);
-            }
-        });
-
-        static::updating(function ($user) {
-            if (! empty($user->password) && ! str_starts_with($user->password, '$2y$')) {
-                // Avoid double hashing
-                $user->password = Hash::make($user->password);
-            }
-        });
-    }
-    
 }

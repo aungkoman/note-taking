@@ -49,12 +49,13 @@ class AuthController extends Controller
     {
         try {
         $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|unique:users,email',
-                'password' => 'required|string|min:6|confirmed',
-                'role_id'=>'required|integer|exists:roles,id',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
+                                'name' => 'required|string|max:255',
+                                'email' => 'required|string|email|unique:users,email',
+                                'password' => 'required|string|min:6|confirmed',
+                                'password_confirmation' => 'required|string|min:6',
+                                'role_id'=>'required|integer|exists:roles,id',
+                            ]);
+                } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors()], 422);
         }
         // return $request;

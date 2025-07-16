@@ -65,10 +65,11 @@ class NoteController extends Controller
 
     }
     public function detail(Request $request, $id){
-        $user  = get_authenticated_user();
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
+        $usercase  = get_authenticated_user();
+        if ($usercase instanceof \Illuminate\Http\JsonResponse) {
+            return $usercase;
         }
+        $user=$usercase["user_id"];
         $perPage = 2;
         $page = $request->input('page', 1);
         $query = Note::where('id', $id)
@@ -97,9 +98,18 @@ class NoteController extends Controller
     }
     public function store(Request $request)
     {
-        $user  = get_authenticated_user();
-        if ($user instanceof \Illuminate\Http\JsonResponse) {
-            return $user;
+        $usercase  = get_authenticated_user();
+        if ($usercase instanceof \Illuminate\Http\JsonResponse) {
+            return $usercase;
+        }
+        $user=$usercase["user_id"];
+        $role=$usercase["role_id"];
+        if($role==1){
+            return response()->json([
+                            'error' => 'Something went wrong',
+                            'message' => "Sorry, your role does not have permission to create notes.",
+                            // 'line' => $e->getLine(),
+                        ], 400);
         }
         try {
            $validated = $request->validate([
@@ -135,10 +145,11 @@ class NoteController extends Controller
     {
         try {
             // Optional: Get authenticated user (if categories are user-owned)
-            $user = get_authenticated_user();
-            if ($user instanceof \Illuminate\Http\JsonResponse) {
-                return $user;
+            $usercase  = get_authenticated_user();
+            if ($usercase instanceof \Illuminate\Http\JsonResponse) {
+                return $usercase;
             }
+            $user=$usercase["user_id"];
            
 
             // Validate the request
@@ -195,10 +206,11 @@ class NoteController extends Controller
     {
         try {
             // Get authenticated user
-            $user = get_authenticated_user();
-            if ($user instanceof \Illuminate\Http\JsonResponse) {
-                return $user;
+            $usercase  = get_authenticated_user();
+            if ($usercase instanceof \Illuminate\Http\JsonResponse) {
+                return $usercase;
             }
+            $user=$usercase["user_id"];
 
             // Find the category that belongs to the user
             $note = Note::where('id', $id)
