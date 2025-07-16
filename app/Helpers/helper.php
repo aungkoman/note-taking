@@ -26,21 +26,3 @@ if (!function_exists('get_authenticated_user')) {
     }
 
 }
-if (!function_exists('check_role')) {
-    function check_role()
-    {
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            return $user->id;
-        } catch (TokenExpiredException $e) {
-            return response()->json(['error' => 'Token has expired'], 401);
-        } catch (TokenInvalidException $e) {
-            return response()->json(['error' => 'Token is invalid'], 401);
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Token is missing or malformed'], 400);
-        }catch (\Exception) {
-            return null;
-        }
-    }
-
-}
