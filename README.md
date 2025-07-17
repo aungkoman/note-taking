@@ -25,8 +25,7 @@ php artisan serve
 
 ## API Documentation
 
-provide postman collection link 👇
-Operation	    Method	    URL
+provide postman collection links
 Registration	POST	    http://127.0.0.1:8000/api/v1/register
 Login	        POST	    http://127.0.0.1:8000/api/v1/register
 Lists	        GET	        http://127.0.0.1:8000/api/v1/notes
