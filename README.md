@@ -40,7 +40,7 @@ Delete	        DELETE	    http://127.0.0.1:8000/api/v1/notes/ {id}
 all the bash we type
 
 ```bash
-
+php artisan make:seeder RoleSeeder
 php artisan make:seeder UserSeeder
 ```
 
