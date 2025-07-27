@@ -1,6 +1,9 @@
 # Note Taking Project
 
 
+## 2025-07-27 Up and RUnning
+
+
 
 ## First Time Setup Code
 
